@@ -30,15 +30,57 @@ def handle_hello():
 
     # this is how you can use the Family datastructure by calling its methods
     members = jackson_family.get_all_members()
-    response_body = {
-        "hello": "world",
-        "family": members
-    }
+    
 
 
-    return jsonify(response_body), 200
+    return jsonify(members), 200
+   
+@app.route('/member', methods=['POST'])
+def addMember():
+    member = request.json
+
+    if not member:
+        return jsonify({"Msj":"Debe enviar un miembro valido!"}), 400
+    jackson_family.add_member(member)
+    return jsonify({"Msj":"Miembro agregado correctamente!"}), 200
+
+    #Metodo DELETE
+@app.route('/member/<int:member_id>', methods=['DELETE'])
+def delete_member(member_id):
+    member = jackson_family.delete_member(member_id)
+
+    if not member:
+        return jsonify({"Msj":"ID no existe!!"})
+
+    print("Miembro eliminado!!")
+    return jsonify(member)
+
+    #Metodo GET por ID
+@app.route('/member/<int:member_id>', methods=['GET'])
+def get_member(member_id):
+
+    member = jackson_family.get_member(member_id)
+
+    if member:
+        return jsonify(member), 200
+    else:
+        return jsonify({"Msj":" Miembro no existe!!"}), 400
+
+   
+
+    #Metodo PUT
+@app.route('/member/<int:member_id>', methods=['PUT'])
+def update_member(member_id):
+
+    member = request.json
+    
+    if not member:
+        return jsonify({"Msj":"Debe enviar un miembro valido!"}), 400
+    jackson_family.update_member(member_id, member)
+    return jsonify(member)
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=PORT, debug=True)
+
